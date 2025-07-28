@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id            Int        @id @default(autoincrement())
+  name               String
+  verified           Boolean    @default(false)
+  role               Role       @default(ARTIST)
+  token_verification String?    
+  token_expires_at   DateTime?  
+  created_at         DateTime   @default(now())
+  updated_at         DateTime?  
+  password           String
+  active             Boolean    @default(true)
+
+  emails     Email[]
+  userPlans  UserPlan[]
+}
+
+model Email {
+  email_id   Int      @id @default(autoincrement())
+  user_id    Int
+  address    String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime?
+  active     Boolean  @default(true)
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
+
+model Plan {
+  plan_id     Int       @id @default(autoincrement())
+  name        String
+  description String
+  price       Decimal   @db.Decimal(15, 2)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime?
+  active      Boolean   @default(true)
+
+  userPlans UserPlan[]
+}
+
+model UserPlan {
+  user_plan_id Int      @id @default(autoincrement())
+  plan_id      Int
+  user_id      Int
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+  updated_at   DateTime?
+  active       Boolean  @default(true)
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  plan Plan @relation(fields: [plan_id], references: [plan_id], onDelete: Cascade)
+}
+
+enum Role {
+  ARTIST
+  CLIENT
+}
