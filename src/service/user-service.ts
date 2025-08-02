@@ -8,20 +8,24 @@ export const createUser = async (user: CreateUserInput) => {
     const password = await hashPassword(user.password);
     const token = crypto.randomBytes(3).toString("hex");
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
-    return await prisma.user.create({
-        data: {
-            name: user.name,
-            password,
-            role: user.role,
-            token_verification: token,
-            token_expires_at: expiresAt,
-            emails: {
-                create: {
-                    address: user.email
+    try {
+        return await prisma.user.create({
+            data: {
+                name: user.name,
+                password,
+                role: user.role,
+                token_verification: token,
+                token_expires_at: expiresAt,
+                emails: {
+                    create: {
+                        address: user.email
+                    }
                 }
             }
-        }
-    })
+        })
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 export const verifyUserToken = async (verificationToken: string) => {

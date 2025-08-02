@@ -3,7 +3,7 @@ import { createUser, verifyUserToken } from "../service/user-service"
 import { CreateUserInput } from "../type/create-user-type";
 import { sendVerificationToken } from "../service/email-service"
 
-export const create = async (req: Request<{}, {}, CreateUserInput>, res: Response, next: NextFunction) => {
+export const register = async (req: Request<{}, {}, CreateUserInput>, res: Response, next: NextFunction) => {
     try {
         const user = req.body;
         if (!user.name || !user.role || !user.email || !user.password) {
