@@ -49,6 +49,7 @@ model Plan {
   created_at  DateTime  @default(now())
   updated_at  DateTime?
   active      Boolean   @default(true)
+  plan_type   PlanType @default(ARTIST)
 
   userPlans UserPlan[]
 }
@@ -67,6 +68,11 @@ model UserPlan {
 }
 
 enum Role {
+  ARTIST
+  CLIENT
+}
+
+enum PlanType {
   ARTIST
   CLIENT
 }

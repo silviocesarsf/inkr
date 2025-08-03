@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { createUser, verifyUserToken } from "../service/user-service"
 import { CreateUserInput } from "../type/create-user-type";
 import { sendVerificationToken } from "../service/email-service"
+import { Role } from "../generated/prisma";
 
 export const register = async (req: Request<{}, {}, CreateUserInput>, res: Response, next: NextFunction) => {
     try {
@@ -9,6 +10,13 @@ export const register = async (req: Request<{}, {}, CreateUserInput>, res: Respo
         if (!user.name || !user.role || !user.email || !user.password) {
             res.status(401).json({
                 error: "Campos insuficientes."
+            });
+            return;
+        }
+
+        if (user.role != Role.CLIENT && user.role != Role.ARTIST) {
+            res.status(401).json({
+                error: "Tipo de cadastro inválido."
             });
             return;
         }
@@ -33,7 +41,7 @@ export const register = async (req: Request<{}, {}, CreateUserInput>, res: Respo
 
 export const verifyToken = async (req: Request<{}, {}, CreateUserInput>, res: Response, next: NextFunction) => {
     try {
-        const { verificationToken: verification_token } = req.body;
+        const { verification_token: verification_token } = req.body;
         if (!verification_token) {
             res.status(400).json({
                 error: "Token não informado."

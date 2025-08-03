@@ -1,14 +1,16 @@
 import { prisma } from "../lib/prisma";
-import { errorHandler } from "../middleware/error-handler";
 import { CreateUserInput } from "../type/create-user-type";
 import { hashPassword } from "../utils/utils";
 import crypto from "crypto";
+import { addDays } from "date-fns";
 
 export const createUser = async (user: CreateUserInput) => {
     const password = await hashPassword(user.password);
     const token = crypto.randomBytes(3).toString("hex");
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
     try {
+
+        const trialPlanId = user.role == "ARTIST" ? 1 : 3; // Ids dos planos gratis
         return await prisma.user.create({
             data: {
                 name: user.name,
@@ -20,11 +22,17 @@ export const createUser = async (user: CreateUserInput) => {
                     create: {
                         address: user.email
                     }
+                },
+                userPlans: {
+                    create: {
+                        plan_id: trialPlanId,
+                        expires_at: addDays(new Date(), 15)
+                    }
                 }
             }
         })
     } catch (err) {
-        console.error(err);
+        throw err;
     }
 }
 

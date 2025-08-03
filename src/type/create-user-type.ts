@@ -5,5 +5,5 @@ export type CreateUserInput = {
   password: string;
   role: Role;
   email: string;
-  verificationToken?: string
+  verification_token?: string
 };

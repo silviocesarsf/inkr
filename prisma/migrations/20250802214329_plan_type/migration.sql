@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Plan` ADD COLUMN `plan_type` ENUM('ARTIST', 'CLIENT') NOT NULL DEFAULT 'ARTIST';

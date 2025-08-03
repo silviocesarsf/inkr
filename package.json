@@ -1,28 +1,35 @@
 {
-  "name": "inkr",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "@prisma/client": "^6.12.0",
-    "@types/bcrypt": "^6.0.0",
-    "@types/express": "^5.0.3",
-    "@types/node": "^24.0.15",
-    "dotenv": "^17.2.0",
-    "express": "^5.1.0",
-    "prisma": "^6.12.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "resend": "^4.7.0"
-  }
+    "name": "inkr",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+        "version": "docker compose exec app node -v",
+        "migrate": "docker compose exec app npx prisma migrate dev",
+        "seed": "docker compose exec app npx prisma db seed",
+        "install": "docker compose exec app npm install"
+    },
+    "prisma": {
+        "seed": "ts-node prisma/seed.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "@prisma/client": "^6.12.0",
+        "@types/bcrypt": "^6.0.0",
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.0.15",
+        "dotenv": "^17.2.0",
+        "express": "^5.1.0",
+        "prisma": "^6.12.0",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.8.3"
+    },
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "date-fns": "^4.1.0",
+        "resend": "^4.7.0"
+    }
 }
