@@ -1,9 +1,13 @@
 import { prisma } from "../lib/prisma";
 import { CreateUserInput } from "../type/create-user-type";
-import { hashPassword } from "../utils/utils";
+import { formatDateToISO, hashPassword } from "../utils/utils";
 import crypto from "crypto";
 import { addDays } from "date-fns";
+import bcrypt from "bcrypt";
+import { HttpError } from "../middleware/http-error";
+import jwt from "jsonwebtoken";
 
+const SECRET = process.env.JWT_SECRET || "";
 export const createUser = async (user: CreateUserInput) => {
     const password = await hashPassword(user.password);
     const token = crypto.randomBytes(3).toString("hex");
@@ -53,7 +57,7 @@ export const verifyUserToken = async (verificationToken: string) => {
         }
 
         if (user.token_expires_at && user.token_expires_at < new Date()) {
-            throw new Error("Token expirado, solicite outro");
+            throw new HttpError("Token expirado, solicite outro.");
         }
 
         await prisma.user.update({
@@ -67,6 +71,66 @@ export const verifyUserToken = async (verificationToken: string) => {
 
         return true;
     } catch (err) {
-        console.error(err);
+        throw err;
+    }
+}
+
+export const loginUser = async (email: string, password: string, rememberMe: boolean): Promise<Object> => {
+    try {
+        const user = await prisma.user.findFirstOrThrow({
+            where: {
+                emails: {
+                    some: {
+                        address: email
+                    }
+                }
+            }
+        });
+
+        const isValid = await bcrypt.compare(password, user.password) || false;
+        if (!isValid) {
+            throw new HttpError("Senha inválida.", 401);
+        }
+
+        if (!user.verified) {
+            throw new HttpError("Verifique seu e-mail", 401);
+        }
+
+        const token = jwt.sign(
+            { userId: user.user_id, role: user.role },
+            SECRET,
+            { expiresIn: rememberMe ? "1d" : "2h" }
+        );
+
+        return token;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getById = async (id: number) => {
+    try {
+        const user = await prisma.user.findFirst({
+            select: {
+                name: true,
+                verified: true,
+                role: true,
+                created_at: true
+            },
+            where: {
+                user_id: id
+            }
+        });
+
+        if (!user) {
+            throw new HttpError("Usuário nao encontrado", 404);
+        }
+
+        const formatedDate = formatDateToISO(user.created_at);
+        (user as any).created_at = formatedDate;
+
+        return user;
+    } catch (err) {
+        throw err;
     }
 }

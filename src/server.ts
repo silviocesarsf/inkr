@@ -1,6 +1,6 @@
 import app from "./app";
 import { errorHandler } from "./middleware/error-handler";
-import userRouter from "./routes/auth/user-routes"
+import userRouter from "./routes/user-routes"
 
 app.use(userRouter);
 app.use(errorHandler)

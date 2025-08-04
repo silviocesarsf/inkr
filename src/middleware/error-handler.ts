@@ -1,5 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Request, Response, NextFunction } from "express";
+import { HttpError } from "./http-error";
 
 export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
     console.error(err);
@@ -21,6 +22,10 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
     }
 
     if (err.status) {
+        return res.status(err.status).json({ error: err.message });
+    }
+
+    if (err instanceof HttpError) {
         return res.status(err.status).json({ error: err.message });
     }
 
