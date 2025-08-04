@@ -3,7 +3,7 @@ import { createUser, verifyUserToken, loginUser, getById } from "../service/user
 import { CreateUserInput } from "../type/create-user-type";
 import { sendVerificationToken } from "../service/email-service"
 import { Role } from "../generated/prisma";
-import { HttpError } from "../middleware/http-error";
+import { HttpError } from "../middleware/http-error"; 
 
 export const register = async (req: Request<{}, {}, CreateUserInput>, res: Response, next: NextFunction) => {
     try {
